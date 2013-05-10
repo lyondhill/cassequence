@@ -208,8 +208,8 @@ module Cassequence
 
     def build_zero_array(set_up_hash, interval = 900)
       resp = {}
-      start = query_hash[:start] or raw.first['time']
-      finish = query_hash[:finish] or raw.last['time']
+      start = (query_hash[:start] or raw.first['time']).to_i
+      finish = (query_hash[:finish] or raw.last['time']).to_i
       number = start.dup
       while number <= finish
         key = middle_of(number, interval).to_s
