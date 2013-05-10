@@ -45,9 +45,9 @@ module Cassequence
 
     def reduce(arr, interval = 900)
       raise 'Arguements must be reduce(Array, Integer)' unless arr.is_a?(Array) and interval.is_a?(Integer)
-      aggrogate = {}
-      count = {}
       set_up_hash = arr.inject({}) { |h, ele| h[ele.to_s] = 0.0; h}
+      aggrogate = build_zero_array(set_up_hash, interval)
+      count = {}
       raw.each do |ele|
         key = middle_of(ele['time'], interval).to_s
         aggrogate[key] ||= set_up_hash.dup
@@ -58,7 +58,7 @@ module Cassequence
       result = []
       aggrogate.each do |key, value|
         c = count[key]
-        arr.each { |guy| value[guy.to_s] = value[guy.to_s] / c }
+        arr.each { |guy| value[guy.to_s] = value[guy.to_s] / (c || 1) }
         result << ({'time' => key.to_i}.merge value)
       end
       result
@@ -204,6 +204,19 @@ module Cassequence
     def to_byte(time)
       time = (time.to_f*1000).to_i
       [time >> 32, time].pack('NN')  
+    end
+
+    def build_zero_array(set_up_hash, interval = 900)
+      resp = {}
+      start = query_hash[:start] or raw.first['time']
+      finish = query_hash[:finish] or raw.last['time']
+      number = start.dup
+      while number <= finish
+        key = middle_of(number, interval).to_s
+        resp[key] ||= set_up_hash.dup
+        number += interval
+      end
+      resp
     end
 
     def middle_of(num, interval = 900)
