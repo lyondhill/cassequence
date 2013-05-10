@@ -210,7 +210,7 @@ module Cassequence
       resp = {}
       start = (query_hash[:start] or raw.first['time']).to_i
       finish = (query_hash[:finish] or raw.last['time']).to_i
-      number = start.dup
+      number = start
       while number <= finish
         key = middle_of(number, interval).to_s
         resp[key] ||= set_up_hash.dup
